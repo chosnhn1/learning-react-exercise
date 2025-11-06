@@ -1,0 +1,22 @@
+{
+    "colors": [
+        {
+            "id": "74b5ae56-c29b-4723-ad0e-841148dbb3d6",
+            "title": "Sunset Ocean",
+            "color": "#00c4e2",
+            "rating": 5
+        },
+        {
+            "id": "38b6ee80-50b2-4bde-bd86-684ae81e5a66",
+            "title": "Grass",
+            "color": "#26ac56",
+            "rating": 5
+        },
+        {
+            "id": "9d3481b0-5621-4ae9-aaf4-851df6bb2281",
+            "title": "Red",
+            "color": "#ff0000",
+            "rating": 0
+        }
+    ]
+}
