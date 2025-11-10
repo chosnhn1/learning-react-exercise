@@ -50,11 +50,12 @@ export default function StarRating({ style = {}, totalStars = 5, ...props }) {  
   * Methods:
     1. Save states to component tree, and pass with prop
 
+* 상태가 앱 여기저기 분산되면 관리하기 힘들다
+* 상태관리 방법 중 하나: prop으로 주고받기
+
 ### 6.4.1
 
 ### 6.4.2 Passing Interactions to Upper Side of Component Tree
-
-
 
 ## 6.5 Form
 
@@ -93,6 +94,8 @@ When you use useRef:
 * do something outside of base React component lifecycle
   * save data outside of re-renderings
 
+* DOM 요소를 직접 참조하는 useRef
+
 ### 6.5.2 Components Controllable
 
 ```jsx
@@ -116,6 +119,8 @@ When you use state to control:
 
 ### 6.5.3 Custom Hooks
 
+반복되는 State 사용을 Custom Hook으로 관리할 수 있다
+
 eg. very big Form element with lots of input
 
 ```jsx
@@ -136,9 +141,18 @@ export const useInput = initialValue => {
   * a good approach, but not always available: especially the app is big and complicated
   * Passing state through multiple nodes: burdensome, makes bugs
 
+* 한 컴포넌트/장소에서 상태 관리하기
+  * 좋은 방법이지만 특히 서비스가 크고 복잡해질수록 관철하기 어려움
+  * 프로젝트가 커지면 결국 여러 컴포넌트에 상태가 산재/분산되기 마련
+  * 매번 prop으로 넘기고 받기: 잘못될 여지가 언제나 존재
+
 * Context: "jet" for react data
   * states are wrapped into "context provider"
   * save all data in one place, but no need to passing them
+
+* 컨텍스트: 상태를 Context Provider에 넣어 관리하기
+  * Context Provider로 해당 상태를 사용하려 하는 소비자를 감싸기
+  * 최상위에서 감싸기도 하지만, 하위 컴포넌트에서 감싸서 사용할 수 있음
 
 ### 6.6.3 Context Provider Having States
 
@@ -154,3 +168,7 @@ export const useInput = initialValue => {
 * custom hooks are good tools for "separation of concerns"!
 * with custom hooks, React Components can only concentrate on rendering UI up to date
 * Hooks can be developed, tested, and even deployed separately 
+
+* React Custom Hook의 강점: "관심사 분리"
+* 컴포넌트의 데이터 핸들링을 Hook에게 넘기고 UI에만 집중할 수 있도록 만듦
+* Hook은 별도로 개발/테스트/배포될 수 있다
