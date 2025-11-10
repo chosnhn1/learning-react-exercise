@@ -2,6 +2,29 @@
 
 * (Already using JS - so only check them briefly)
 
+1. 변수 선언하기
+  1. const 키워드
+  2. let 키워드
+  3. 템플릿 문자열
+2. 함수 만들기
+  1. 함수 선언
+  2. 함수 표현식
+  3. 디폴트 파라미터
+  4. 화살표 함수
+3. 자바스크립트 컴파일하기
+4. 객체와 배열
+  1. 구조 분해를 사용한 대입
+  2. 배열 구조 분해하기
+  3. 객체 리터럴 개선
+  4. 스프레드 연산자
+5. 비동기 자바스크립트
+  1. 단순한 프라미스와 fetch
+  2. async/await
+  3. 프라미스 만들기
+6. 클래스
+7. ES6 모듈
+  1. 커먼JS CommonJS
+
 ## 2.3 Compiling
 
 * "Compile" usually means (high) programming lang >> machine lang

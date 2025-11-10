@@ -20,6 +20,17 @@
     * `useCallback`
     * `useMemo`
 
+1. useEffect
+  1. 의존 관계 배열
+  2. 의존 관계를 깊게 검사하기
+  3. useLayoutEffect를 사용해야 하는 경우
+  4. 훅스의 규칙 
+  5. useReducer로 코드 개선하기
+  6. useReducer로 복잡한 상태 처리하기
+  7. 컴포넌트 성능 개선
+  8. shouldComponentUpdate와 PureComponent
+  9. 언제 리팩터링할까?
+
 ## 7.1 `useEffect`
 
 What if Component should do something after rendering?

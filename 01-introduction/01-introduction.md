@@ -1,12 +1,5 @@
 # React
 
-## 1.1 Roadmap
-
-1. What is React?
-2. Basic JavaScript
-3. Syntax & Functional Programming
-  * What is Functinal Programming? (v. imparative programming)
-4. Component
-5. JSX
-6. State
-7. 
+1. 튼튼한 토대
+2. 리액트의 과거와 미래
+3. 코드 예제 사용법
