@@ -5,9 +5,25 @@
 * fresh data, stale data
 
 1. 데이터 요청하기
+  1. 요청으로 데이터 보내기
+  2. fetch로 파일 업로드하기
+  3. 권한 요청
+  4. 데이터를 로컬 스토리지에 저장하기
+  5. 프라미스 상태 처리하기
 2. 렌더 프롭
 3. 가상화된 리스트
+  1. fetch 훅 만들기
+  2. fetch 컴포넌트 만들기
+  3. 여러 요청 처리하기
+  4. 값 메모화하기
+  5. 폭포수 요청
+  6. 네트워크 속도 제한
+  7. 병렬 요청
+  8. 값 기다리기
+  9. 요청 취소하기
 4. 그래프QL 소개
+  1. 깃허브 그래프QL API
+  2. 그래프QL 요청 보내기
 
 ## 8.1 데이터 요청하기
 
@@ -290,24 +306,297 @@ function GitHubUser({ login }) {
 
 ### 8.3.2 fetch 컴포넌트 만들기
 
-### 8.3.3 여러 요청 처리하기
+* Reusable fetch to custom hooks
+* If rendering part is reusable, why not?: `Fetch` component
+* [Fetch](./Fetch.jsx)
 
-### 8.3.4 값 메모화하기
+```jsx
+function Fetch({
+  uri,
+  renderSuccess,
+  loadingFallback = <p>loading...</p>, 
+  renderError = error => (
+    <pre>{JSON.stringify(error, null, 2)}</pre>
+  )
+}) {
+  const { loading, data, error } = useFetch(uri);
+  if (loading) return loadingFallback;
+  if (error) return renderError(error);
+  if (data) return renderSuccess({ data });
+}
+```
+
+```jsx
+// GitHubUser.jsx
+// ...
+import Fetch from "./Fetch";
+
+export default function GitHubUser({ login }) {
+  return (
+    <Fetch
+      uri={`https://api.github.com/users/${login}`}
+      renderSuccess={UserDetails}
+    />
+  );
+}
+
+function UserDetails({ data }) {
+  return (
+    // ...
+  );
+}
+```
+
+This component is flex and customisable like this:
+
+```jsx
+<Fetch
+  uri={``}
+  loadingFallback={<LoadingSpinner />}
+  renderError={error => {
+    return <p>Something went wrong!</p>;
+  }}
+  renderSuccess={() => (<>
+    <h1>Todo: </h1>
+  </>)}
+/>
+```
+
+Use abstraction "properly" and make your app less complex
+
+
+### 8.3.3 여러 요청 처리하기 & 8.3.4 값 메모화하기
+
+Web apps make many requests; let's handle them out.
+
+* [useIterator](./useIterator.jsx) custom hook
+  * memoized
+    * this is less for optimization
+    * more for usability
+
+```jsx
+const [letter, previous, next] = useIterator([
+  "a", "b", "c"
+]);
+```
+
+* [RepoMenu](./RepoMenu.jsx)
 
 ### 8.3.5 폭포수 요청 Waterfall Request
 
+* two requests
+  1. user account info
+  2. user repo list
+* this is called "waterfall"
+* let's add layers to this
+
+* `react-markdown` 활용 예제
+  * [Repo](https://github.com/remarkjs/react-markdown)
+
+```jsx
+const loadReadme = async (login, repo) => {
+  const uri = `https://api.github.com/repos/${login}/${repo}/readme`;
+  const { download_url } = await fetch(uri).then(res =>
+    res.json()
+  );
+  const markdown = await fetch(download_url).then(res => 
+    res.text()
+  );
+
+  console.log(`Markdown for ${repo}\n\n${markdown}`);
+}
+```
+
+* [적용 예시](./RepositoryReadme.jsx)
+
 ### 8.3.6 네트워크 속도 제한
+
+* Browser Dev tools: Network speed
 
 ### 8.3.7 병렬 요청
 
+* Parallel requests
+  * <-> Waterfall requests
+    * right now, components are rendered inside other ones
+    * GitHubUser > UserRepositories > RepositoryReadme
+  * if you want to render them in parallel, components should be located near alongside other ones, not incorporating each other
+
+```jsx
+// App.jsx
+
+// ...
+export default function App() {
+  const [login, setLogin] = useState("username");
+  const [repo, setRepo] = useState("a-repo-name");
+
+  return (<>
+    <SearchForm value={login} onSearch={setLogin} />
+    <GitHubUser login={login} />
+    <UserRepositories
+      login={login}
+      repo={repo}
+      onSelect={setRepo}
+    />
+    <RepositoryReadme login={login} repo={repo} />
+  </>)
+} 
+```
+
+
 ### 8.3.8 값 기다리기
+
+* initialize component with initial values...
+* But What if you cannot make a good guess?
+  * one solution: just don't render
+
+* Example
+  * Each components will be rendered when state value changes and initialized
+
+```jsx
+return (<>
+  <SearchForm value={login} onSearch={setLogin} />
+  {login && <GitHubUser login={login} />}
+  {login && (
+    <UserRepositories
+      login={login}
+      repo={repo}
+      onSelect={setRepo}
+      Virtualized
+    />
+  )}
+  {login && repo && (
+    <RepositoryReadme login={login} repo={repo} />
+  )}
+</>);
+```
 
 ### 8.3.9 요청 취소하기
 
+* What if, user erase field value, or search nobody?
+
+```jsx
+export default function App() {
+  // ...
+
+  const handleSearch = login => {
+    if (login) return setLogin(login);
+    setLogin("");
+    setRepo("");
+  };
+
+  if (!login) {
+    return (
+      <SearchForm value={login} onSearch={handleSearch} />
+    );
+  }
+
+  return (
+    <>
+      <SearchForm value={login} onSearch={handleSearch} />
+      <GitHubUser login={login} />
+      <UserRepositories
+        login={login}
+        repo={repo}
+        onSelect={setRepo}
+      />
+      <RepositoryReadme login={login} repo={repo} />
+    </>
+  );
+}
+```
+
+* You have parts conditionally rendered
+* But, what if component are unmounted while passing data?
+  * especially when user has slow network
+* solutions
+  * hooks for noticing component mount
+
+```jsx
+export function useMountedRef() {
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => (mounted.current = false);
+  });
+  return mounted;
+}
+```
+
+```jsx
+const mounted = useMountedRef();
+const loadReadme = useCallback(async (login, repo) => {
+  //...
+
+  if (mounted.current) {
+    setMarkdown(markdown);
+    setLoading(false);
+  }
+}, []);
+```
+
 ## 8.4 그래프QL 소개 GraphQL
 
-[GraphQL]
+* [GraphQL]()
+  * a method of declare ways of communication
+  * making request requires...
+    * a HTTP request, as always
+    * plus GraphQL query
 
 ### 8.4.1 깃허브 그래프QL API
+
+* [Uh-oh...](https://github.blog/changelog/2025-11-07-graphql-explorer-removal-from-api-documentation-on-november-7-2025/)
+
+Request:
+
+```gql
+query {
+  user(login: "username") {
+    id
+    login
+    name
+    location
+    avatarUrl
+  }
+}
+```
+
+Response example:
+
+```json
+{
+  "data": {
+    "user": {
+      "id": "29udfj-dfheuf",
+      "login": "username",
+      "name": "User Name",
+      "location": "Somewhere, SW",
+      "avatarUrl": "https://github.com/username.png"
+    }
+  }
+}
+```
+
+* make reusable computation
+  * `$login` as socket
+  * `repositories` for first 100 repos
+  * alias `avatar_url` for `avatarUrl` 
+
+```gql
+query findRepos($login: String!) {
+  user(login: $login) {
+    login
+    name
+    location
+    avatar_url: avatarUrl
+    repositories(first: 100) {
+      totalCount
+      nodes {
+        name
+      }
+    }
+  }
+}
+```
+
 
 ### 8.4.1 그래프QL 요청 보내기
