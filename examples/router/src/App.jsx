@@ -1,6 +1,6 @@
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
-import { Home, About, Events, Products, Contact } from "./pages";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Home, About, Events, Products, Contact, Whoops404, Services, History, Location } from "./pages";
 
 function App() {
   return (
@@ -8,9 +8,23 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
-          path="/about"
+          path="about"
           element={<About />}
-        />
+        >
+          <Route
+            // watch out for absolute - relative path
+            path="services"
+            element={<Services />}
+          />
+          <Route
+            path="history"
+            element={<History />}
+          />
+          <Route
+            path="location"
+            element={<Location />}
+          />
+        </Route>
         <Route
           path="/events"
           element={<Events />}
@@ -22,6 +36,11 @@ function App() {
         <Route
           path="/contact"
           element={<Contact />}
+        />
+        {/* <Redirect from="services" to="about/services" /> */}
+        <Route
+          path="/services"
+          element={<Navigate to="/about/services" replace />}
         />
         <Route path="*" element={<Whoops404 />} />
       </Routes>
