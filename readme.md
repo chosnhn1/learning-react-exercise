@@ -18,3 +18,7 @@
 ## Links
 
 * [O'Reilly](https://www.oreilly.com/library/view/learning-react-2nd/9781492051718/)
+
+* Timeframes
+
+* Finished at 14 Nov, 2025
